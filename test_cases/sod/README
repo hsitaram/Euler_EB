@@ -1,0 +1,13 @@
+This is the Sod shock tube test case.
+Make sure sod_shock_tube flag is turned on in inputs_3d file
+
+Open the "open.visit" file in VisIt.
+
+to run do
+<executable_name> inputs_3d
+
+for example
+euler3d.gnu.ex inputs_3d
+
+parallel example
+mpirun -n 4 euler3d.gnu.MPI.ex inputs_3d

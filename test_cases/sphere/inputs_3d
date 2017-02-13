@@ -1,0 +1,36 @@
+plot_int = 1000
+n_cell_x = 128
+n_cell_y = 128
+n_cell_z = 128
+max_grid_size = 32
+
+lower_corner = 0 0 0 
+upper_corner = 1 1 1
+
+//0 periodic 
+//1 supersonic inlet
+//2 subsonic inlet
+//3 supersonic outlet
+//4 subsonic outlet
+//5 no slip wall 
+
+Left_bc   = 1.0 1.0 2.5 0.0 0.0 1.0 
+Right_bc  = 3.0 1.0 0.0 0.0 0.0 1.0 
+Bottom_bc = 0.0 1.0 0.0 0.0 0.0 1.0 
+Top_bc    = 0.0 1.0 0.0 0.0 0.0 1.0 
+Back_bc   = 0.0 1.0 0.0 0.0 0.0 1.0 
+Front_bc  = 0.0 1.0 0.0 0.0 0.0 1.0
+
+density_initial = 1.0
+velx_initial    = 2.5
+vely_initial    = 0.0
+velz_initial    = 0.0
+pressure_initial = 1.0
+
+final_time = 0.6
+time_step = -0.0001
+cfl_num  = 1.0
+write_time = 0.03
+stdout_step_num = 10
+time_stepping_order = 4
+sod_shock_tube = 0

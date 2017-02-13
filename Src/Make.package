@@ -1,0 +1,15 @@
+CEXE_sources += main.cpp
+CEXE_sources += solver.cpp
+CEXE_sources += writePlotFile.cpp
+CEXE_sources += ebmesher.cpp
+CEXE_sources += boundarycondition.cpp
+f90EXE_sources += dirichlet_bcs.f90
+f90EXE_sources += init_vars.f90 
+f90EXE_sources += holeCutSurf.f90 
+f90EXE_sources += writeparaviewfile.f90 
+f90EXE_sources += eb_fortran_functions.f90 
+f90EXE_sources += bc_fill.f90 
+f90EXE_sources += bc_fortran_functions.f90 
+f90EXE_sources += inviscid_terms.f90 
+f90EXE_sources += inviscid_calculator.f90 
+f90EXE_sources += timestepping_schemes.f90

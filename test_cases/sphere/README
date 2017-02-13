@@ -1,0 +1,18 @@
+This is the case of supersonic flow around a sphere.
+
+The sphere is hard coded based on an equation. Its center is
+at 0.5,0.5,0.5 and has a radius of 0.25. This was one of the
+first cases I tried while developing the embedded boundary solver.
+
+To run this case, it needs EB_SPHERE defined.
+Compile code using -DEB_SPHERE. Change the GNUMakefile with
+DEFINES+=-DEB_SPHERE.
+
+to run do
+<executable_name> inputs_3d
+
+for example
+euler3d.gnu.ex inputs_3d
+
+parallel example
+mpirun -n 4 euler3d.gnu.MPI.ex inputs_3d

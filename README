@@ -1,0 +1,17 @@
+Firstly, download BoxLib from github.
+git clone https://github.com/BoxLib-Codes/BoxLib
+
+Correct the paths in the GNUMakefile in Euler_EB/Src.
+
+To compile Euler_EB
+
+cd Euler_EB/Src
+
+adjust the GNUMakefile, set the correct compilers/options.
+For instance, set USE_MPI=FALSE for serial runs.
+"make" at the command prompt will probably work of the shelf.
+
+If not, go to BoxLib/Tools/C_mk/comps and edit the compilers
+Also adjust the Make.unknown in BoxLib/Tools/C_mk/sites for MPI compilation.
+
+You will also need VisIt 2.12 for visualization.
