@@ -15,3 +15,16 @@ If not, go to BoxLib/Tools/C_mk/comps and edit the compilers
 Also adjust the Make.unknown in BoxLib/Tools/C_mk/sites for MPI compilation.
 
 You will also need VisIt 2.12 for visualization.
+
+Mac notes
+=========
+
+The original MAC gcc from command line tools does not install gfortran.
+
+use macports to install gcc
+
+$sudo port install gcc6
+$port select --summary will tell you the package name for gcc
+$port select --set gcc <packagename>
+
+Do the same for installing openmpi-gcc6
