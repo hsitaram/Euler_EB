@@ -9,13 +9,14 @@
 !   Adapted by Hari Sitaraman for BoxLib : 12/13/16
 !
 !====================================================================
-subroutine holeCutSurf(lo,hi,xl,ds,ng,xsurf,ncf3,nnodes,ntri,solidPoints,vfrac)
+subroutine holeCutSurf(glo,ghi,lo,hi,xl,ds,ng,xsurf,ncf3,nnodes,ntri,solidPoints,vfrac)
 !
 implicit none
 include 'f_constants.h'
 !
 ! subroutine arguments
 !
+integer, intent(in) :: glo(THREEDIM),ghi(THREEDIM) !global extents of domain
 integer,intent(in) :: lo(THREEDIM),hi(THREEDIM),ng,nnodes,ntri                    ! dimensions of cart grid, number of fringes
 double precision, intent(in)    :: xl(THREEDIM)                                   ! lower-left-bottom corner of cartesian grid
 double precision, intent(in)    :: ds(THREEDIM)                                   ! size of cartesian grid cell 
@@ -31,7 +32,7 @@ integer    :: ncf3(THREEDIM,ntri)                                               
 !
 double precision, allocatable :: xdd(:)
 integer, allocatable :: idd(:)
-integer :: ipointer(lo(DIRY)-ng:hi(DIRY)+ng,lo(DIRZ)-ng:hi(DIRZ)+ng)
+integer :: ipointer(glo(DIRY)-ng:ghi(DIRY)+ng,glo(DIRZ)-ng:ghi(DIRZ)+ng)
 integer, allocatable :: iltri(:)
 double precision, allocatable :: cof(:,:),xd(:)
 !
@@ -46,16 +47,14 @@ double precision   :: l1,l2,l3
 double precision   :: xmax(THREEDIM),xmin(THREEDIM),areamax
 double precision   :: lenmax,xx,yy,zz,y1,z1,tmp,fac,eps1,eps2,den,xlen,xcm
 integer :: jdim,jkdim,nf1,nf2
-double precision :: vfrac_p(lo(DIRX)-ng:hi(DIRX)+ng+1,& 
-			lo(DIRY)-ng:hi(DIRY)+ng+1,lo(DIRZ)-ng:hi(DIRZ)+ng+1)  !node centered
 double precision :: vertexsum
+integer :: j1_local,j2_local
 !
 ! begin
 !
 !write(6,*) 'tri1=',ncf3(:,1)
 ibcount=0
 solidPoints=0
-vfrac_p=1.d0
 vfrac=1.d0
 !
 ! initialize local iblanking
@@ -97,22 +96,23 @@ enddo
 !     inside the bounding box
 !
 
-js=hi(DIRX)+1
-je=lo(DIRX)
+!note: the +1 is for number of points instead of cells
+js=ghi(DIRX)+1
+je=glo(DIRX)
 
-ks=hi(DIRY)+1
-ke=lo(DIRY)
+ks=ghi(DIRY)+1
+ke=glo(DIRY)
 
-ls=hi(DIRZ)+1
-le=lo(DIRZ)
+ls=ghi(DIRZ)+1
+le=glo(DIRZ)
 
-do l=lo(DIRZ),hi(DIRZ)+1
+do l=glo(DIRZ),ghi(DIRZ)+1
    zz=ds(DIRZ)*dble(l)+xl(DIRZ)
 
-   do k=lo(DIRY),hi(DIRY)+1
+   do k=glo(DIRY),ghi(DIRY)+1
       yy=ds(DIRY)*dble(k)+xl(DIRY)
 
-      do j=lo(DIRX),hi(DIRX)+1
+      do j=glo(DIRX),ghi(DIRX)+1
          xx=ds(DIRX)*dble(j)+xl(DIRX)
 
          if ((xx-xmin(DIRX))*(xx-xmax(DIRX)).le.0.and.&
@@ -142,7 +142,7 @@ endif
 ! current cartesian box
 !
 allocate(iltri(ntri))
-
+!print *,"here",glo,ghi,lo,hi
 itri=0
 do i=1,ntri
    vertexLoop1: do n=1,THREEDIM
@@ -262,15 +262,16 @@ do ii=1,itri
       enddo
    endif
 enddo
+!print *,"here",glo,ghi,lo,hi
 !
-js1=hi(DIRX)+1
-je1=lo(DIRX)
+js1=ghi(DIRX)+1
+je1=glo(DIRX)
 
-ks1=hi(DIRY)+1
-ke1=lo(DIRY)
+ks1=ghi(DIRY)+1
+ke1=glo(DIRY)
 
-ls1=hi(DIRZ)+1
-le1=lo(DIRZ)
+ls1=ghi(DIRZ)+1
+le1=glo(DIRZ)
 
 !
 ! perform the actual iblanking
@@ -333,8 +334,19 @@ lloop: do l=ls,le
             j2=min(floor((xd(ii+1)-xl(DIRX))/ds(DIRX)),je)
 
             if (j2.ge.j1) then
-               vfrac_p(j1:j2,k,l)=0.d0
-               ibcount=ibcount+(j2-j1+1)
+               
+               j1_local=max(j1,lo(DIRX))
+               j2_local=min(j2,hi(DIRX))
+
+               !print *,j1_local,j2_local,j1,j2
+
+               if(j2_local .ge. j1_local) then
+
+                    if( (k .ge. lo(DIRY)) .and. (k .le. hi(DIRY)) .and. (l .ge. lo(DIRZ)) .and. (l .le. hi(DIRZ)) ) then
+                        !print *,"j,k,l:",j1_local,j2_local,k,l,lo,hi
+                        vfrac(j1_local:j2_local,k,l)=0.d0
+                    endif
+               endif
 
                js1=min(js1,j1)
                je1=max(je1,j2)
@@ -342,6 +354,7 @@ lloop: do l=ls,le
                ke1=max(ke1,k)
                ls1=min(ls1,l)
                le1=max(le1,l)
+
             endif
             ii=ii+2
          enddo
@@ -349,31 +362,6 @@ lloop: do l=ls,le
       endif itrChk
    enddo kloop
 enddo lloop
-!
-!counting solid points
-!
-do l=lo(DIRZ),hi(DIRZ)
-   do k=lo(DIRY),hi(DIRY)
-      do j=lo(DIRX),hi(DIRX)
-
-	 vertexsum=0.d0
-	 vertexsum=vertexsum+vfrac_p(j,k,l)
-	 vertexsum=vertexsum+vfrac_p(j+1,k,l)	
-	 vertexsum=vertexsum+vfrac_p(j+1,k+1,l)	
-	 vertexsum=vertexsum+vfrac_p(j,k+1,l)	
-	 
-	 vertexsum=vertexsum+vfrac_p(j,k,l+1)
-	 vertexsum=vertexsum+vfrac_p(j+1,k,l+1)	
-	 vertexsum=vertexsum+vfrac_p(j+1,k+1,l+1)	
-	 vertexsum=vertexsum+vfrac_p(j,k+1,l+1)	
-
-	 if (vertexsum .lt. 8.d0) then
-	    vfrac(j,k,l)=0.d0
-            solidPoints=solidPoints+1
-         endif
-      enddo
-   enddo
-enddo
 !
 ! deallocate local memory
 !

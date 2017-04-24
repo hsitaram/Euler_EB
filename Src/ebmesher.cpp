@@ -49,7 +49,7 @@ void ebmesher::update_volfrac(Geometry &geom,int &nghost,int ncx,int ncy,int ncz
 				geom.CellSize(), geom.ProbLo(), geom.ProbHi(),
 				&rad,pos);
 #else
-		find_volfrac_in_box((*eb_volfrac)[mfi].dataPtr(),
+		find_volfrac_in_box((*eb_volfrac)[mfi].dataPtr(),glo,ghi,
 				bx.loVect(), bx.hiVect(),&nghost,
 				geom.CellSize(), geom.ProbLo(), geom.ProbHi(),
 				surface_coordinates,connectivity,&num_of_nodes,

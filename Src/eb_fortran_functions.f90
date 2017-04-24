@@ -91,11 +91,12 @@ subroutine find_volfrac_in_box_forsphere(vfrac,lo,hi,ng,dx,problo,probhi,rad,pos
 
 end subroutine find_volfrac_in_box_forsphere
 !==================================================================
-subroutine find_volfrac_in_box(vfrac,lo,hi,ng,dx,problo,probhi,surfcoord,conn,nnodes,ntri) bind(C,name="find_volfrac_in_box")
+subroutine find_volfrac_in_box(vfrac,glo,ghi,lo,hi,ng,dx,problo,probhi,surfcoord,conn,nnodes,ntri) bind(C,name="find_volfrac_in_box")
 
 	implicit none
 	include 'f_constants.h'
 
+        integer          :: glo(THREEDIM),ghi(THREEDIM)
 	integer          :: lo(THREEDIM),hi(THREEDIM),ng
 	double precision :: dx(THREEDIM),pos(THREEDIM)
 	double precision :: problo(THREEDIM),probhi(THREEDIM)
@@ -108,7 +109,7 @@ subroutine find_volfrac_in_box(vfrac,lo,hi,ng,dx,problo,probhi,surfcoord,conn,nn
 	integer :: i,j,k,solidpoints
 
 	vfrac = 1.d0
-  	call holeCutSurf(lo,hi,problo,dx,ng,surfcoord,conn,nnodes,ntri,solidpoints,vfrac)
+  	call holeCutSurf(glo,ghi,lo,hi,problo,dx,ng,surfcoord,conn,nnodes,ntri,solidpoints,vfrac)
 
 end subroutine find_volfrac_in_box
 !==================================================================
